@@ -52,7 +52,12 @@ router.post('/', function(req, res, next) {
                 }).save()
 
                 if (await User.findOne(email)) {
-
+                    transporter.sendMail({
+                        from: '"Localhost:300', // sender address
+                        to: email, // list of receivers
+                        subject: "Sign Up", // Subject line
+                        text: "Your password: " + password, // plain text body
+                    });
 
                     res.status(201).json({ success: 'User created! password ' + password })
                 } else {
