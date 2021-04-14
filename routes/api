@@ -1,0 +1,71 @@
+var express = require('express')
+var mongoose = require('mongoose')
+var config = require('config')
+var bcrypt = require('bcrypt')
+const { validationResult } = require('express-validator')
+var router = express.Router()
+
+let transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+        user: config.get('Ethereal.user'), // generated ethereal user
+        pass: contig.get('Ethereal.pass'), // generated ethereal password
+    }
+}),
+mongoose.connect(config.get('dbconnect.link'), {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+   console.log('Connected to MongoDB successfully!')
+});
+
+
+/* GET users listing. */
+router.post('/', function(req, res, next) {
+    var body = JSON.parse(req.body),
+        body.email.isEmail(),
+        errors = validationResult(req),
+
+    if (errors.isEmpty()) {
+        switch (body.action) {
+            case 'CreateUser':
+                var check = await User.findOne(email)
+
+                if (check) {
+                    return res.status(400).json({ errors: 'E-mail already exists!' })
+                }
+
+                var password = generator.generate({
+                    length: 10,
+                    numbers: true
+                })
+
+                await new User({
+                    email: email,
+                    password: await bcrypt.hash(password, 10)
+                }).save()
+
+                if (await User.findOne(email)) {
+
+
+                    res.status(201).json({ success: 'User created! password ' + password })
+                } else {
+                    res.status(400).json({ errors: 'User don`t save' })
+                }
+
+                break
+            case 'CreateToken':
+                break
+        }
+    } else {
+        res.status(400).json({ errors: errors.array() })
+    }
+});
+
+module.exports = router;
